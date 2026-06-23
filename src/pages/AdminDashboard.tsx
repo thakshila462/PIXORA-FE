@@ -5,14 +5,14 @@ import api from "../service/api";
 
 import {
   Users,
-  Hourglass,
-  CheckCircle2,
+  // Hourglass,
+  // CheckCircle2,
   Coins,
   BarChart3,
   Calendar,
-  Sparkles,
+  // Sparkles,
   TrendingUp,
-  Award,
+  // Award,
   X,
   Crown,
   Layers,

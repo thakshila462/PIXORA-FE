@@ -9,7 +9,7 @@ import {
   Canvas, 
   FabricImage, 
   Circle, 
-  IText, 
+  IText,
   filters,
   Object as FabricObject
 } from "fabric";
@@ -39,10 +39,13 @@ const Editor = () => {
   // Layers State
   const [canvasObjects, setCanvasObjects] = useState<FabricObject[]>([]);
 
+  // ✨ AI Magic Prompt State
+  const [aiPrompt, setAiPrompt] = useState<string>(""); 
+
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const fabricCanvasRef = useRef<Canvas | null>(null);
   
-  // ✨ Layers Tracking Refs (Typed properly for v6)
+  // ✨ Layers Tracking Refs
   const bgImgRef = useRef<FabricImage | null>(null);   
   const fgImgRef = useRef<FabricImage | null>(null);   
   const maskControlRef = useRef<Circle | null>(null); 
@@ -99,7 +102,7 @@ const Editor = () => {
     };
   }, []);
 
-  // ✅ SAFE CANVAS TO BLOB METHOD (Fixes lowerCanvasEl vulnerability)
+  // ✅ SAFE CANVAS TO BLOB METHOD
   const getCanvasImageFile = (): Promise<File | null> => {
     return new Promise((resolve) => {
       const canvas = fabricCanvasRef.current;
@@ -136,7 +139,9 @@ const Editor = () => {
 
       const formData = new FormData();
       formData.append("image", file);
+      formData.append("prompt", aiPrompt); // ✨ Customer ලියන Prompt එක මෙතනින් Backend එකට යනවා
 
+      // Backend API Call
       const res = await fetch("http://localhost:5000/api/v1/ai/enhance", {
         method: "POST",
         body: formData,
@@ -145,7 +150,7 @@ const Editor = () => {
       const data = await res.json();
 
       if (!data.success) {
-        alert("AI Server Enhancement Failed");
+        alert("AI Server Enhancement Failed: " + (data.message || "Unknown Error"));
         return;
       }
 
@@ -158,7 +163,6 @@ const Editor = () => {
       const canvas = fabricCanvasRef.current;
       if (!canvas) return;
 
-      // Safe asynchronous image loader element
       const loadImage = (url: string) =>
         new Promise<HTMLImageElement>((resolve, reject) => {
           const img = new Image();
@@ -185,12 +189,12 @@ const Editor = () => {
       canvas.centerObject(img);
       canvas.add(img);
 
-      // Reset layer references because image structure was re-baselined
+      // Reset layer references
       bgImgRef.current = null;
       fgImgRef.current = null;
       maskControlRef.current = null;
 
-      // Reset local color filters adjustment values to default
+      // Reset sliders
       setBrightness(0);
       setContrast(0);
       setSaturation(0);
@@ -200,7 +204,7 @@ const Editor = () => {
 
       canvas.renderAll();
       setCanvasObjects([...canvas.getObjects()]);
-      alert("Image enhanced successfully via AI! ✨");
+      alert("Image processed successfully via AI! ✨");
 
     } catch (err) {
       console.error("AI Enhance Execution Error:", err);
@@ -210,7 +214,7 @@ const Editor = () => {
     }
   };
 
-  // ✨ UPDATE MASK POSITION (With center origins & Fabric v6 direct setter fix)
+  // ✨ UPDATE MASK POSITION
   const updateMaskPosition = () => {
     const fgImg = fgImgRef.current;
     const maskRing = maskControlRef.current;
@@ -242,7 +246,7 @@ const Editor = () => {
     canvas.renderAll();
   }, [focusRadius]);
 
-  // 2. Handle Image Upload (Fixed for Fabric v6 with HTMLImageElement Loading)
+  // 2. Handle Image Upload
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !fabricCanvasRef.current) return;
@@ -260,7 +264,6 @@ const Editor = () => {
         canvas.clear();
         canvas.backgroundColor = "#171717";
 
-        // Layer 1: Background Image Instance
         const bgImg = new FabricImage(imgElement, {
           crossOrigin: "anonymous"
         });
@@ -271,7 +274,6 @@ const Editor = () => {
         }
         canvas.centerObject(bgImg);
         
-        // Layer 2: Foreground Image
         const fgImg = new FabricImage(imgElement, {
           crossOrigin: "anonymous",
           left: bgImg.left,
@@ -282,7 +284,6 @@ const Editor = () => {
         fgImg.scaleToWidth(bgImg.getScaledWidth());
         fgImg.scaleToHeight(bgImg.getScaledHeight());
 
-        // Layer 3: Interactive Focus Ring Control
         const maskRing = new Circle({
           radius: focusRadius,
           left: (canvas.width || 380) / 2,
@@ -321,13 +322,12 @@ const Editor = () => {
     reader.readAsDataURL(file);
   };
 
-  // 3. Apply Filters (Real-time GPU Adjustments with v6 Safety Checks)
+  // 3. Apply Filters
   useEffect(() => {
     const bgImg = bgImgRef.current;
     const fgImg = fgImgRef.current;
     const canvas = fabricCanvasRef.current;
     
-    // Safety Guard to prevent undefined assignment loops
     if (!bgImg || !canvas) return;
 
     bgImg.filters = [];
@@ -388,7 +388,6 @@ const Editor = () => {
     if (!canvas) return;
     const activeObject = canvas.getActiveObject();
     
-    // ✅ Safe Type Check syntax replacement for v6
     if (activeObject && activeObject.type === "i-text") {
       activeObject.set("fontFamily", selectedFont);
       activeObject.set("fill", textColor);
@@ -492,25 +491,37 @@ const Editor = () => {
       <main className="flex-1 flex flex-col bg-[#06090f] p-4 md:p-0 min-h-[500px]">
         {/* Top Control Bar */}
         <div className="h-14 border-b border-neutral-900/60 bg-neutral-950/40 backdrop-blur-md px-4 md:px-6 flex items-center justify-between z-10 rounded-xl md:rounded-none">
-          <div className="flex items-center gap-3">
-            <label className="flex items-center gap-2 bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-[11px] md:text-xs px-3 py-1.5 md:px-4 md:py-2 rounded-xl font-bold tracking-wider uppercase cursor-pointer transition-all">
+          <div className="flex items-center gap-3 flex-1">
+            <label className="flex items-center gap-2 bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-[11px] md:text-xs px-3 py-1.5 md:px-4 md:py-2 rounded-xl font-bold tracking-wider uppercase cursor-pointer transition-all shrink-0">
               <Upload className="w-3.5 h-3.5 text-pink-500" />
               Upload Photo
               <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
             </label>
 
+            {/* ✨ NEW: AI MAGIC PROMPT DYNAMIC INPUT BOX */}
+            <div className="hidden sm:flex items-center relative flex-1 max-w-xs md:max-w-sm">
+              <input
+                type="text"
+                placeholder="Describe AI changes (e.g., make it a 90s vintage portrait)..."
+                value={aiPrompt}
+                onChange={(e) => setAiPrompt(e.target.value)}
+                disabled={enhancing || canvasObjects.length === 0}
+                className="w-full bg-neutral-900/80 border border-neutral-800/80 text-[11px] md:text-xs px-3.5 py-2 rounded-xl text-slate-200 outline-none focus:border-orange-500/50 transition-all disabled:opacity-40"
+              />
+            </div>
+
             {/* ✨ NATIVE SERVER-SIDE AI ENHANCE TRIGGER */}
             <button
               onClick={handleAIEnhance}
               disabled={enhancing || canvasObjects.length === 0}
-              className="flex items-center gap-2 bg-gradient-to-r from-amber-500 to-orange-600 hover:opacity-95 text-neutral-950 disabled:opacity-40 disabled:cursor-not-allowed text-[11px] md:text-xs px-3 py-1.5 md:px-4 md:py-2 rounded-xl font-black tracking-wider uppercase shadow-md shadow-orange-500/10 transition-all"
+              className="flex items-center gap-2 bg-gradient-to-r from-amber-500 to-orange-600 hover:opacity-95 text-neutral-950 disabled:opacity-40 disabled:cursor-not-allowed text-[11px] md:text-xs px-3 py-1.5 md:px-4 md:py-2 rounded-xl font-black tracking-wider uppercase shadow-md shadow-orange-500/10 transition-all shrink-0"
             >
               <Wand2 className={`w-3.5 h-3.5 ${enhancing ? "animate-spin" : ""}`} />
-              {enhancing ? "Enhancing..." : "AI Enhance ✨"}
+              {enhancing ? "Processing..." : "AI Edit ✨"}
             </button>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0 ml-2">
             <button 
               onClick={handleSaveFabricJson}
               className="bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-neutral-400 px-3 py-1.5 rounded-lg text-[11px] md:text-xs font-bold tracking-wider uppercase flex items-center gap-1.5 transition-all"
@@ -524,6 +535,18 @@ const Editor = () => {
               <Download className="w-3.5 h-3.5" /> Export PNG
             </button>
           </div>
+        </div>
+
+        {/* Mobile Input Box (Responsive view එකේදී විතරක් පේන්න) */}
+        <div className="block sm:hidden px-4 pt-2">
+          <input
+            type="text"
+            placeholder="Describe AI changes..."
+            value={aiPrompt}
+            onChange={(e) => setAiPrompt(e.target.value)}
+            disabled={enhancing || canvasObjects.length === 0}
+            className="w-full bg-neutral-900 border border-neutral-800 text-xs px-3 py-2 rounded-xl text-slate-200 outline-none focus:border-orange-500 transition-all disabled:opacity-40"
+          />
         </div>
 
         {/* Live Canvas Window */}
@@ -724,7 +747,6 @@ const Editor = () => {
                   if (obj === bgImgRef.current) layerName = "🖼️ Background Photo";
                   else if (obj === fgImgRef.current) layerName = "🖼️ Foreground Subject (Hidden)";
                   else if (obj === maskControlRef.current) layerName = "🎯 Focus Mask Controller";
-                  // Fixed type recognition for v6 layers
                   else if (obj.type === "i-text") layerName = `🔤 Text (${(obj as any).text?.substring(0, 8)}...)`;
 
                   return (
@@ -741,17 +763,6 @@ const Editor = () => {
                         <span className="text-[10px] text-neutral-600 font-bold">#{idx + 1}</span>
                         <span className="capitalize font-bold text-[11px] text-neutral-200">{layerName}</span>
                       </div>
-                      
-                      <button 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          if (obj === bgImgRef.current || obj === fgImgRef.current || obj === maskControlRef.current) return;
-                          obj.canvas?.remove(obj);
-                        }}
-                        className="text-neutral-600 hover:text-rose-500 p-1"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
                     </div>
                   );
                 })

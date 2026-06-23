@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import api from "../service/api"; 
 import {
   Camera,
-  MapPin,
+  // MapPin,
   CheckCircle2,
   XCircle,
   Clock4,
@@ -11,7 +11,7 @@ import {
   Mail,
   Coins,
   FileText,
-  Star,
+  // Star,
   Loader2,
   Phone,
   CreditCard // ⚡ අලුත් Icon එකක්

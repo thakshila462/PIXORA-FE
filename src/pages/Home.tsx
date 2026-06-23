@@ -6,9 +6,9 @@ import {
   Camera,
   Sparkles,
   Sliders,
-  Flame,
-  Award,
-  Layers,
+  // Flame,
+  // Award,
+  // Layers,
   Zap
 } from "lucide-react";
 
