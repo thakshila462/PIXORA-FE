@@ -84,7 +84,7 @@ const Booking = () => {
 
     const loadPackages = async () => {
       try {
-        const res = await fetch("http://localhost:5000/api/v1/packages");
+        const res = await fetch("https://pixora-be-tau.vercel.app/api/v1/packages");
         const data = await res.json();
 
         setPackages(
@@ -128,7 +128,7 @@ const Booking = () => {
     setAiReply("");
 
     try {
-      const res = await fetch("http://localhost:5000/api/v1/ai/chat", {
+      const res = await fetch("https://pixora-be-tau.vercel.app/api/v1/ai/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ message: aiMessage }),
@@ -221,7 +221,7 @@ const Booking = () => {
     }
 
     try {
-      const res = await fetch("http://localhost:5000/api/v1/service-request", {
+      const res = await fetch("https://pixora-be-tau.vercel.app/api/v1/service-request", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
