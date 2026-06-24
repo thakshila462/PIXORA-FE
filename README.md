@@ -1,5 +1,46 @@
 # React + TypeScript + Vite
 
+
+```md
+# Pixora Frontend - React Application
+
+## 📌 Project Description
+Pixora Frontend is a React + TypeScript web application for a full-stack system that allows users to register, login, and use AI-powered services with a modern UI.
+
+---
+
+## 🛠️ Tech Stack
+- React + TypeScript
+- Redux Toolkit
+- TailwindCSS
+- Axios
+- React Router DOM
+
+---
+
+## 🚀 Features
+- User Authentication (Login/Register)
+- Protected Routes
+- Redux State Management
+- Responsive UI with TailwindCSS
+- AI-powered features integration
+- Service request management
+- Admin dashboard support
+
+---
+
+## 📁 Project Structure
+```
+
+frontend/
+├── src/
+│   ├── components/
+│   ├── pages/
+│   ├── store/
+│   ├── services/
+│   ├── routes/
+│   └── App.tsx
+
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 Currently, two official plugins are available:
