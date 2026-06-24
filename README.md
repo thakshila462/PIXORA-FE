@@ -4,12 +4,12 @@
 ```md
 # Pixora Frontend - React Application
 
-## 📌 Project Description
+##  Project Description
 Pixora Frontend is a React + TypeScript web application for a full-stack system that allows users to register, login, and use AI-powered services with a modern UI.
 
 ---
 
-## 🛠️ Tech Stack
+##  Tech Stack
 - React + TypeScript
 - Redux Toolkit
 - TailwindCSS
@@ -18,7 +18,7 @@ Pixora Frontend is a React + TypeScript web application for a full-stack system 
 
 ---
 
-## 🚀 Features
+##  Features
 - User Authentication (Login/Register)
 - Protected Routes
 - Redux State Management
@@ -29,7 +29,9 @@ Pixora Frontend is a React + TypeScript web application for a full-stack system 
 
 ---
 
-## 📁 Project Structure
+##url=https://pixora-fe.vercel.app
+
+##  Project Structure
 ```
 
 frontend/
