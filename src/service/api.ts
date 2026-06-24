@@ -1,7 +1,8 @@
 import axios, { AxiosHeaders } from "axios";
 
 const api = axios.create({
-  baseURL: "http://localhost:5000/api/v1",
+  // baseURL: "http://localhost:5000/api/v1",
+  baseURL:"https://pixora-be-tau.vercel.app/api/v1"
 });
 
 // Public endpoints
